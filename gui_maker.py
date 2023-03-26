@@ -9,7 +9,12 @@ class monitor:
         self.q_eye_l_seta = [0 for _ in range(self.GRAPH_SIZE)]
         self.q_eye_r_seta = [0 for _ in range(self.GRAPH_SIZE)]
 
+        self.q_mouth_l_seta = [0 for _ in range(self.GRAPH_SIZE)]
+        self.q_mouth_r_seta = [0 for _ in range(self.GRAPH_SIZE)]
+
         self.WHITE = [255, 255, 255]
+
+        self.FONT = cv2.FONT_HERSHEY_SIMPLEX
 
     def pushEyeSeta(self, seta_l, seta_r):
         self.q_eye_l_seta.pop(0)
@@ -17,12 +22,44 @@ class monitor:
         self.q_eye_l_seta.append(seta_l)
         self.q_eye_r_seta.append(seta_r)
 
-    def DrawMonitorSeta(self):
+    def pushMouthSeta(self, seta_l, seta_r):
+        self.q_mouth_l_seta.pop(0)
+        self.q_mouth_r_seta.pop(0)
+        self.q_mouth_l_seta.append(seta_l)
+        self.q_mouth_r_seta.append(seta_r)
+
+    def DrawMonitorSeta(self, q_l_seta, q_r_seta):
         graph_l = np.zeros((self.GRAPH_HEIGHT, self.GRAPH_SIZE), np.uint8)
         graph_r = np.zeros((self.GRAPH_HEIGHT, self.GRAPH_SIZE), np.uint8)
         mid_h = int(self.GRAPH_HEIGHT / 2)
         for i in range(1, self.GRAPH_SIZE):
-            cv2.line(graph_l, (i - 1, mid_h - int(self.q_eye_l_seta[i - 1])), (i, mid_h - int(self.q_eye_l_seta[i])), self.WHITE, 1)
-            cv2.line(graph_r, (i - 1, mid_h - int(self.q_eye_r_seta[i - 1])), (i, mid_h - int(self.q_eye_r_seta[i])), self.WHITE, 1)
-        cv2.imshow("Graph-Seta-L", graph_l)
-        cv2.imshow("Graph-Seta-R", graph_r)
+            cv2.line(graph_l, (i - 1, mid_h - int(q_l_seta[i - 1])), (i, mid_h - int(q_l_seta[i])),
+                     self.WHITE, 1)
+            cv2.line(graph_r, (i - 1, mid_h - int(q_r_seta[i - 1])), (i, mid_h - int(q_r_seta[i])),
+                     self.WHITE, 1)
+        return graph_l, graph_r
+
+    def DrawMonitorEyeSeta(self):
+        graph_l, graph_r = self.DrawMonitorSeta(self.q_eye_l_seta, self.q_eye_r_seta)
+        cv2.imshow("Graph-Eye-L-Seta", graph_l)
+        cv2.imshow("Graph-Eye-R-Seta", graph_r)
+
+    def DrawMonitorMouthSeta(self):
+        graph_l, graph_r = self.DrawMonitorSeta(self.q_mouth_l_seta, self.q_mouth_r_seta)
+        cv2.imshow("Graph-Mouth-L-Seta", graph_l)
+        cv2.imshow("Graph-Mouth-R-Seta", graph_r)
+
+    def DrawMediapipe(self, img):
+        cv2.imshow("Mediapipe Result", img)
+
+    def putText(self, img, text, x, y):
+        cv2.putText(img, text, (x, y), self.FONT, 0.5, self.WHITE, 1)
+        return img
+
+    def DrawStatus(self, eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta):
+        background = np.zeros((200, 400), np.uint8)
+        background = self.putText(background, 'EYE_L: ' + str(eye_l_seta), 10, 15)
+        background = self.putText(background, 'EYE_R: ' + str(eye_r_seta), 10, 30)
+        background = self.putText(background, 'MOUTH_L: ' + str(mouth_l_seta), 10, 45)
+        background = self.putText(background, 'MOUTH_R: ' + str(mouth_r_seta), 10, 60)
+        cv2.imshow("Status", background)
