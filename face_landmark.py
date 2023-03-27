@@ -25,9 +25,9 @@ class Detector:
         self.EYE_R_SETA_IDX = [362, 385, 380]
 
         # 좌측 입 벌어짐 각도(왼쪽 끝, 위측, 아래측)
-        self.MOUTH_L_SETA_IDX = [78, 80, 88]
+        self.MOUTH_L_SETA_IDX = [78, 13, 14]
         # 우측 입 벌어짐 각도(오른쪽 끝, 위측, 아래측)
-        self.MOUTH_R_SETA_IDX = [308, 310, 318]
+        self.MOUTH_R_SETA_IDX = [308, 13, 14]
 
         # Mediapipe 모델 가져오기(FaceMesh)
         self.face_mesh = self.mp_face_mesh.FaceMesh(
