@@ -22,6 +22,8 @@ if __name__ == '__main__':
     while True:
         # Webcam으로부터 이미지 읽어오기
         check, image = cam.read()
+
+        image = cv2.resize(image, (640, 480))
         # 이미지 가져오기에 실패 시 재시도
         if check is None:
             continue
@@ -32,7 +34,7 @@ if __name__ == '__main__':
         # 인식 결과 이미지(보조선) 출력
         landmarker.getEyeResultIMG(image)
         landmarker.getMouthResultIMG(image)
-        cv2.imshow("MOUTH", image)
+        cv2.imshow("DETECT", image)
 
         # 얼굴이 감지 되지 않았다면 재탐색
         if not landmarker.isFaceDetected():
@@ -42,7 +44,7 @@ if __name__ == '__main__':
         # 1차 Low Pass Filter로 잡음 제거
         eye_l_seta, eye_r_seta = eye_l_seta_lpf.compute(eye_l_seta), eye_r_seta_lpf.compute(eye_r_seta)
         # 인식된 눈의 각도 데이터 넣기
-        monitor.pushEyeSeta(eye_l_seta*2, eye_r_seta*2)
+        monitor.pushEyeSeta(eye_l_seta*2.5, eye_r_seta*2.5)
         # 눈의 각도 인식 결과 그래프 출력
         monitor.DrawMonitorEyeSeta()
         # 입 벌어짐 각도 계산

@@ -1,5 +1,8 @@
 import cv2
 import numpy as np
+import time
+import datetime
+import winsound as sd
 
 class monitor:
     def __init__(self, width = 900, height = 300):
@@ -8,6 +11,7 @@ class monitor:
 
         self.q_eye_l_seta = [0 for _ in range(self.GRAPH_SIZE)]
         self.q_eye_r_seta = [0 for _ in range(self.GRAPH_SIZE)]
+        self.q_eye_closed = [0 for _ in range(self.GRAPH_SIZE)]
 
         self.q_mouth_l_seta = [0 for _ in range(self.GRAPH_SIZE)]
         self.q_mouth_r_seta = [0 for _ in range(self.GRAPH_SIZE)]
@@ -15,6 +19,12 @@ class monitor:
         self.WHITE = [255, 255, 255]
 
         self.FONT = cv2.FONT_HERSHEY_SIMPLEX
+
+        self.prev_eye_status = False
+        self.eye_last_open = None
+        self.eye_last_close = None
+
+        self.shouldBeep = False
 
     def pushEyeSeta(self, seta_l, seta_r):
         self.q_eye_l_seta.pop(0)
@@ -57,9 +67,38 @@ class monitor:
         return img
 
     def DrawStatus(self, eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta):
+        is_eye_closed = False
+        if eye_l_seta < 30 and eye_r_seta < 30:
+            is_eye_closed = True
+        if self.prev_eye_status and not is_eye_closed:
+            self.eye_last_open = datetime.datetime.now()
+        if not self.prev_eye_status and is_eye_closed:
+            self.eye_last_close = datetime.datetime.now()
+
+        if self.eye_last_close is not None and self.eye_last_open is not None:
+            if self.eye_last_close > self.eye_last_open:
+                time_delta_ms = (self.eye_last_close - self.eye_last_open).microseconds / 1000
+                print(time_delta_ms)
+                if time_delta_ms > 400:
+                    self.shouldBeep = True
+
+        if self.shouldBeep:
+            #self.beepsound()
+            print('Beeeeeeeeeeeep')
+            self.shouldBeep = False
+
+        self.prev_eye_status = is_eye_closed
         background = np.zeros((200, 400), np.uint8)
         background = self.putText(background, 'EYE_L: ' + str(eye_l_seta), 10, 15)
         background = self.putText(background, 'EYE_R: ' + str(eye_r_seta), 10, 30)
         background = self.putText(background, 'MOUTH_L: ' + str(mouth_l_seta), 10, 45)
         background = self.putText(background, 'MOUTH_R: ' + str(mouth_r_seta), 10, 60)
+        background = self.putText(background, 'EYE_CLOSED: ' + str(is_eye_closed), 10, 75)
+        background = self.putText(background, 'LAST_OPENED: ' + str(self.eye_last_open), 10, 90)
+        background = self.putText(background, 'LAST_CLOSED: ' + str(self.eye_last_close), 10, 105)
         cv2.imshow("Status", background)
+
+    def beepsound(self):
+        fr = 2000  # range : 37 ~ 32767
+        du = 500  # 1000 ms ==1second
+        sd.Beep(fr, du)  # winsound.Beep(frequency, duration)
