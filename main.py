@@ -24,14 +24,14 @@ if __name__ == '__main__':
     #프레임 계산을 위한 이전 시간 저장하는 변수
     prev_frame_t = time.time()
     #타겟 프레임
-    TARGET_FPS = 30
+    TARGET_FPS = 60
 
     # 메인 루프
     while True:
         # Webcam으로부터 이미지 읽어오기
         check, image = cam.read()
 
-        image = cv2.resize(image, (640, 480))
+        image = cv2.resize(image, (640, 360))
 
         # 이미지 가져오기에 실패 시 재시도
         if check is None:
@@ -67,6 +67,7 @@ if __name__ == '__main__':
         #타겟 프레임 이상 나올시 남은 시간 대기시켜 타겟프레임에 근사
         while (time.time() - prev_frame_t) <= 1./TARGET_FPS:
             continue
+
         #프레임 계산
         new_frame_t = time.time()
         fps = 1 / (new_frame_t - prev_frame_t)
