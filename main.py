@@ -2,6 +2,8 @@ import face_landmark
 import gui_maker
 import cv2
 import filter
+import server
+import time
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -10,21 +12,19 @@ if __name__ == '__main__':
     # 그래프 시각화 객체
     monitor = gui_maker.monitor(900, 300)
 
-    """
-    #LPF 한번
-    # Low Pass Filter 객체
-    eye_l_seta_lpf = filter.LPF(0.7)
-    eye_r_seta_lpf = filter.LPF(0.7)
-    mouth_l_seta_lpf = filter.LPF(0.7)
-    mouth_r_seta_lpf = filter.LPF(0.7)
-    """
+    #udp_sock = server.UDP_socket('127.0.0.1', '9999')
 
     eye_l_seta_lpf = filter.CascadedLPF(0.7, 0.7)
-    eye_r_seta_lpf = filter.CascadedLPF(0.7,0.7)
-    mouth_l_seta_lpf = filter.CascadedLPF(0.7,0.7)
+    eye_r_seta_lpf = filter.CascadedLPF(0.7, 0.7)
+    mouth_l_seta_lpf = filter.CascadedLPF(0.7, 0.7)
     mouth_r_seta_lpf = filter.CascadedLPF(0.7, 0.7)
     # Webcam 객체
     cam = cv2.VideoCapture(0)
+
+    #프레임 계산을 위한 이전 시간 저장하는 변수
+    prev_frame_t = time.time()
+    #타겟 프레임
+    TARGET_FPS = 30
 
     # 메인 루프
     while True:
@@ -32,6 +32,7 @@ if __name__ == '__main__':
         check, image = cam.read()
 
         image = cv2.resize(image, (640, 480))
+
         # 이미지 가져오기에 실패 시 재시도
         if check is None:
             continue
@@ -63,8 +64,16 @@ if __name__ == '__main__':
         monitor.pushMouthSeta(mouth_l_seta, mouth_r_seta)
         # 입의 각도 인식 결과 그래프 출력
         monitor.DrawMonitorMouthSeta()
-        #
-        monitor.DrawStatus(eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta)
+        #타겟 프레임 이상 나올시 남은 시간 대기시켜 타겟프레임에 근사
+        while (time.time() - prev_frame_t) <= 1./TARGET_FPS:
+            continue
+        #프레임 계산
+        new_frame_t = time.time()
+        fps = 1 / (new_frame_t - prev_frame_t)
+        prev_frame_t = new_frame_t
+        #결과 출력
+        monitor.DrawStatus(eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta, fps)
+
 
 
         # 'q' 입력 시 프로그램 종료

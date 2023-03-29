@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import time
 import datetime
-#import winsound as sd
+import pygame
 
 class monitor:
     def __init__(self, width = 900, height = 300):
@@ -25,6 +25,8 @@ class monitor:
         self.eye_last_close = None
 
         self.shouldBeep = False
+        pygame.mixer.init()
+
 
     def pushEyeSeta(self, seta_l, seta_r):
         self.q_eye_l_seta.pop(0)
@@ -66,7 +68,7 @@ class monitor:
         cv2.putText(img, text, (x, y), self.FONT, 0.5, self.WHITE, 1)
         return img
 
-    def DrawStatus(self, eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta):
+    def DrawStatus(self, eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta, fps):
         is_eye_closed = False
         if eye_l_seta < 30 and eye_r_seta < 30:
             is_eye_closed = True
@@ -83,7 +85,7 @@ class monitor:
                     self.shouldBeep = True
 
         if self.shouldBeep:
-            #self.beepsound()
+            self.beepsound()
             print('Beeeeeeeeeeeep')
             self.shouldBeep = False
 
@@ -96,9 +98,9 @@ class monitor:
         background = self.putText(background, 'EYE_CLOSED: ' + str(is_eye_closed), 10, 75)
         background = self.putText(background, 'LAST_OPENED: ' + str(self.eye_last_open), 10, 90)
         background = self.putText(background, 'LAST_CLOSED: ' + str(self.eye_last_close), 10, 105)
+        background = self.putText(background, 'FPS: ' + str(fps), 10, 120)
         cv2.imshow("Status", background)
 
     def beepsound(self):
-        fr = 2000  # range : 37 ~ 32767
-        du = 500  # 1000 ms ==1second
-        sd.Beep(fr, du)  # winsound.Beep(frequency, duration)
+        pygame.mixer.music.load('./music/beep.mp3')  # 배경 음악
+        pygame.mixer.music.play(0)
