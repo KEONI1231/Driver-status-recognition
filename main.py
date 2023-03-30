@@ -24,7 +24,7 @@ if __name__ == '__main__':
     #프레임 계산을 위한 이전 시간 저장하는 변수
     prev_frame_t = time.time()
     #타겟 프레임
-    TARGET_FPS = 60
+    TARGET_FPS = 30
 
     # 메인 루프
     while True:
@@ -43,10 +43,11 @@ if __name__ == '__main__':
         # 인식 결과 이미지(보조선) 출력
         landmarker.getEyeResultIMG(image)
         landmarker.getMouthResultIMG(image)
+        image = cv2.flip(image, 1)
         cv2.imshow("DETECT", image)
 
         # 얼굴이 감지 되지 않았다면 재탐색
-        if not landmarker.isFaceDetected():
+        if not landmarker.isFaceDetected():q
             continue
         # 눈의 각도 계산
         eye_l_seta, eye_r_seta = landmarker.getEyeSetas()
@@ -74,7 +75,6 @@ if __name__ == '__main__':
         prev_frame_t = new_frame_t
         #결과 출력
         monitor.DrawStatus(eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta, fps)
-
 
 
         # 'q' 입력 시 프로그램 종료
