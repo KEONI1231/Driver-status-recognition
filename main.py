@@ -31,7 +31,7 @@ if __name__ == '__main__':
         # Webcam으로부터 이미지 읽어오기
         check, image = cam.read()
 
-        image = cv2.resize(image, (640, 360))
+        image = cv2.resize(image, (1920, 1080))
 
         # 이미지 가져오기에 실패 시 재시도
         if check is None:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         cv2.imshow("DETECT", image)
 
         # 얼굴이 감지 되지 않았다면 재탐색
-        if not landmarker.isFaceDetected():q
+        if not landmarker.isFaceDetected():
             continue
         # 눈의 각도 계산
         eye_l_seta, eye_r_seta = landmarker.getEyeSetas()
