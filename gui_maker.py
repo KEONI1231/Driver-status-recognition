@@ -56,13 +56,13 @@ class monitor:
 
     def DrawMonitorEyeSeta(self):
         graph_l, graph_r = self.DrawMonitorSeta(self.q_eye_l_seta, self.q_eye_r_seta)
-        cv2.imshow("Graph-Eye-L-Seta", graph_l)
-        cv2.imshow("Graph-Eye-R-Seta", graph_r)
+        cv2.imshow("Graph-Eye-R-Seta", graph_l)
+        cv2.imshow("Graph-Eye-L-Seta", graph_r)
 
     def DrawMonitorMouthSeta(self):
         graph_l, graph_r = self.DrawMonitorSeta(self.q_mouth_l_seta, self.q_mouth_r_seta)
-        cv2.imshow("Graph-Mouth-L-Seta", graph_l)
-        cv2.imshow("Graph-Mouth-R-Seta", graph_r)
+        cv2.imshow("Graph-Mouth-R-Seta", graph_l)
+        cv2.imshow("Graph-Mouth-L-Seta", graph_r)
 
     def DrawMediapipe(self, img):
         cv2.imshow("Mediapipe Result", img)
@@ -94,10 +94,10 @@ class monitor:
 
         self.prev_eye_status = is_eye_closed
         background = np.zeros((200, 400), np.uint8)
-        background = self.putText(background, 'EYE_L: ' + str(eye_l_seta), 10, 15)
-        background = self.putText(background, 'EYE_R: ' + str(eye_r_seta), 10, 30)
-        background = self.putText(background, 'MOUTH_L: ' + str(mouth_l_seta), 10, 45)
-        background = self.putText(background, 'MOUTH_R: ' + str(mouth_r_seta), 10, 60)
+        background = self.putText(background, 'EYE_R: ' + str(eye_l_seta), 10, 15)
+        background = self.putText(background, 'EYE_L: ' + str(eye_r_seta), 10, 30)
+        background = self.putText(background, 'MOUTH_R: ' + str(mouth_l_seta), 10, 45)
+        background = self.putText(background, 'MOUTH_L: ' + str(mouth_r_seta), 10, 60)
         background = self.putText(background, 'EYE_CLOSED: ' + str(is_eye_closed), 10, 75)
         background = self.putText(background, 'LAST_OPENED: ' + str(self.eye_last_open), 10, 90)
         background = self.putText(background, 'LAST_CLOSED: ' + str(self.eye_last_close), 10, 105)

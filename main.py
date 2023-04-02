@@ -31,7 +31,7 @@ if __name__ == '__main__':
         # Webcam으로부터 이미지 읽어오기
         check, image = cam.read()
 
-        image = cv2.resize(image, (640, 480))
+        image = cv2.resize(image, (1920, 1080))
 
         # 이미지 가져오기에 실패 시 재시도
         if check is None:
@@ -43,6 +43,7 @@ if __name__ == '__main__':
         # 인식 결과 이미지(보조선) 출력
         landmarker.getEyeResultIMG(image)
         landmarker.getMouthResultIMG(image)
+        image = cv2.flip(image, 1)
         cv2.imshow("DETECT", image)
 
         # 얼굴이 감지 되지 않았다면 재탐색
@@ -69,13 +70,13 @@ if __name__ == '__main__':
         #타겟 프레임 이상 나올시 남은 시간 대기시켜 타겟프레임에 근사
         while (time.time() - prev_frame_t) <= 1./TARGET_FPS:
             continue
+
         #프레임 계산
         new_frame_t = time.time()
         fps = 1 / (new_frame_t - prev_frame_t)
         prev_frame_t = new_frame_t
         #결과 출력
         monitor.DrawStatus(eye_l_seta, eye_r_seta, mouth_l_seta, mouth_r_seta, fps)
-
 
 
         # 'q' 입력 시 프로그램 종료
