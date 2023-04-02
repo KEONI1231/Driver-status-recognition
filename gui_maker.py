@@ -9,6 +9,9 @@ class monitor:
         self.GRAPH_SIZE = width
         self.GRAPH_HEIGHT = height
 
+        self.HISTOGRAM_SIZE = 600
+        self.HISTOGRAM_HEIGHT = 450
+
         self.q_eye_l_seta = [0 for _ in range(self.GRAPH_SIZE)]
         self.q_eye_r_seta = [0 for _ in range(self.GRAPH_SIZE)]
         self.q_eye_closed = [0 for _ in range(self.GRAPH_SIZE)]
@@ -104,3 +107,14 @@ class monitor:
     def beepsound(self):
         pygame.mixer.music.load('./music/beep.mp3')  # 배경 음악
         pygame.mixer.music.play(0)
+
+    def DrawHistogramEyeSeta(self):
+        histogram_eye_seta = [0 for _ in range(self.HISTOGRAM_SIZE)]
+        hist_eye_seta = np.zeros((self.HISTOGRAM_HEIGHT, self.HISTOGRAM_SIZE), np.uint8)
+        for seta in self.q_eye_l_seta:
+            histogram_eye_seta[int(seta * 10)] += 10
+        for seta in self.q_eye_r_seta:
+            histogram_eye_seta[int(seta * 10)] += 10
+        for i in range(self.HISTOGRAM_SIZE):
+            cv2.line(hist_eye_seta, (i, self.HISTOGRAM_HEIGHT), (i, self.HISTOGRAM_HEIGHT - histogram_eye_seta[i]), self.WHITE, 1)
+        cv2.imshow("Histogram", hist_eye_seta)

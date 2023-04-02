@@ -6,7 +6,7 @@ import server
 import time
 
 # Press the green button in the gutter to run the script.
-if __name__ == '__main__':
+if __name__ == '__main__': 
     # Mediapipe 객체
     landmarker = face_landmark.Detector()
     # 그래프 시각화 객체
@@ -53,9 +53,11 @@ if __name__ == '__main__':
         # 1차 Low Pass Filter로 잡음 제거
         eye_l_seta, eye_r_seta = eye_l_seta_lpf.compute(eye_l_seta), eye_r_seta_lpf.compute(eye_r_seta)
         # 인식된 눈의 각도 데이터 넣기
-        monitor.pushEyeSeta(eye_l_seta*2.5, eye_r_seta*2.5)
+        monitor.pushEyeSeta(eye_l_seta, eye_r_seta)
         # 눈의 각도 인식 결과 그래프 출력
         monitor.DrawMonitorEyeSeta()
+
+        monitor.DrawHistogramEyeSeta()
         # 입 벌어짐 각도 계산
         mouth_l_seta, mouth_r_seta = landmarker.getMouthSetas()
         # 1차 Low Pass Filter로 잡음 제거
