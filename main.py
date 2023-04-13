@@ -1,9 +1,13 @@
 import face_landmark
+import fuzzy_logic
 import gui_maker
 import cv2
 import filter
 import server
 import time
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__': 
@@ -14,6 +18,7 @@ if __name__ == '__main__':
 
     #udp_sock = server.UDP_socket('127.0.0.1', '9999')
 
+    eye_l_seta_lpf = filter.CascadedLPF(0.7, 0.7)
     eye_l_seta_lpf = filter.CascadedLPF(0.7, 0.7)
     eye_r_seta_lpf = filter.CascadedLPF(0.7, 0.7)
     mouth_l_seta_lpf = filter.CascadedLPF(0.7, 0.7)
@@ -26,11 +31,22 @@ if __name__ == '__main__':
     #타겟 프레임
     TARGET_FPS = 30
 
+    # 그래프 초기화
+    plt.ion()
+    fig, ax = plt.subplots()
+    x = np.arange(0, 100)
+    y = np.zeros_like(x)
+    ax.set_ylim([-0.1, 1.1])
+    ax.axhline(y=0.5, color='r', linestyle='--')
+    line, = ax.plot(x, y)
+
+
+
     # 메인 루프
     while True:
         # Webcam으로부터 이미지 읽어오기
         check, image = cam.read()
-
+        check, frame = cam.read()
         image = cv2.resize(image, (1920, 1080))
 
         # 이미지 가져오기에 실패 시 재시도
@@ -51,8 +67,57 @@ if __name__ == '__main__':
             continue
         # 눈의 각도 계산
         eye_l_seta, eye_r_seta = landmarker.getEyeSetas()
-        # 1차 Low Pass Filter로 잡음 제거
+        # 1차 Low Pass Filter로 잡음 제거q
         eye_l_seta, eye_r_seta = eye_l_seta_lpf.compute(eye_l_seta), eye_r_seta_lpf.compute(eye_r_seta)
+
+
+        #여긴 내가 작성한 퍼지 논리 그래프 시각화
+        #eye_LR_seta = (eye_r_seta+eye_l_seta)/2.0
+        # line = None  # 추가된 코드
+        # def sleepiness_detection(x):
+        #     y1 = np.where(x < 15, 1, np.where(x < 30, (30 - x) / 15, 0))
+        #     y2 = np.where(x < 20, 0, np.where(x < 35, (x - 20) / 15, np.where(x < 50, (50 - x) / 15, 0)))
+        #     y3 = np.where(x < 45, 0, np.where(x < 60, (x - 45) / 15, 1))
+        #     return np.fmax(np.fmax(y1, y2), y3)
+        #
+        # eye_LR_seta = eye_l_seta
+        #
+        # # 현재 프레임에서의 졸음 상태 판단
+        # sleepiness = sleepiness_detection(eye_LR_seta)
+        #
+        # # 그래프에 졸음 상태 추가
+        # y = np.append(y, sleepiness)
+        # print(y)
+        # # 최근 100프레임까지의 졸음 상태 그래프 표시
+        # if line is None:
+        #     line, = ax.plot(x[-100:], y[-100:])
+        # else:
+        #     line.set_ydata(y[-100:])
+        # ax.axhline(y=0.5, color='r', linestyle='--')
+        # ax.set_ylim([-0.1, 1.1])
+        # plt.draw()
+        # plt.pause(0.01)
+        #
+        # # OpenCV 화면에 그래프 그리기
+        # if len(plt.get_fignums()) > 0:  # 이미 창이 열려있으면 닫아줌
+        #     plt.close()
+        # fig, ax = plt.subplots()
+        # img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # img = cv2.resize(img, (800, 600))
+        # plt_img = np.zeros_like(img)
+        # plt_img[100:300, 500:600, :] = 255 * np.tile(np.expand_dims(y[-1], axis=-1), (200, 100, 3))
+        # plt_img = cv2.cvtColor(plt_img.astype(np.uint8), cv2.COLOR_RGB2BGR)
+        # img = cv2.addWeighted(img, 0.8, plt_img, 0.2, 0)
+        #
+        #
+        # # 종료
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
+        #
+        #
+
+        #여기까지
+
         # 인식된 눈의 각도 데이터 넣기
         monitor.pushEyeSeta(eye_l_seta, eye_r_seta)
         # 눈의 각도 인식 결과 그래프 출력
